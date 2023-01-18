@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wisdom-model-server
+  # You'll usually want to add your resources to the argocd namespace.
+  namespace: argocd
+  # Add this finalizer ONLY if you want these to cascade delete.
+  # Add labels to your application object.
+  labels:
+    name: model-server
+spec:
+  # The project the application belongs to.
+  project: default
+
+  # Source of the application manifests
+  source:
+    repoURL: https://github.com/jameswnl/wisdom-deploy.git
+    targetRevision: HEAD
+    path: dev
+
+
+
+  # Destination cluster and namespace to deploy the application
+  destination:
+    server: https://kubernetes.default.svc
+    # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
+    namespace: wisdom-dev
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false # Allows deleting all application resources during automatic syncing ( false by default ).
+    syncOptions:     # Sync options which modifies sync behavior
+    - CreateNamespace=true
+
+    retry:
+      limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+      backoff:
+        duration: 2m
+        factor: 2
+        maxDuration: 20m
+
+  # Will ignore differences between live and desired states during the diff. Note that these configurations are not
+  # used during the sync process.
+  ignoreDifferences:
+  # for the specified json pointers
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas
+  # for the specified managedFields managers
+  - group: "*"
+    kind: "*"
+    managedFieldsManagers:
+    - kube-controller-manager
+
+  # RevisionHistoryLimit limits the number of items kept in the application's revision history, which is used for
+  # informational purposes as well as for rollbacks to previous versions. This should only be changed in exceptional
+  # circumstances. Setting to zero will store no history. This will reduce storage used. Increasing will increase the
+  # space used to store the history, so we do not recommend increasing it.
+  revisionHistoryLimit: 10
