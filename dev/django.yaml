@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: django
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -34,6 +34,6 @@ spec:
   selector:
     app: django
   ports:
-  - port: django-port
+  - port: 80
     protocol: TCP
     targetPort: 80
