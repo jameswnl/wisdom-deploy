@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django
+  name: redis
 spec:
   selector:
     matchLabels:
-      app: django
+      app: redis
   replicas: 2
   template:
     metadata:
       labels:
-        app: django
+        app: redis
     spec:
       containers:
-      - name: django
-        image: silintl/django:4.0.3.22.04
+      - name: redis
+        image: redis:latest
         ports:
-        - containerPort: 80
+        - containerPort: 6379
         resources:
           limits:
             cpu: 500m
@@ -29,11 +29,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: django-service
+  name: redis-service
 spec:
   selector:
-    app: django
+    app: redis
   ports:
-  - port: django-port
+  - port: redis-port
     protocol: TCP
-    targetPort: 80
+    targetPort: 6379
