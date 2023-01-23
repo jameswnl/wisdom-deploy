@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: wisdom-model-server
-  namespace: argocd
+  name: wisdom-service
+  namespace: openshift-gitops
   labels:
-    name: model-server
+    name: wisdom-service
 spec:
   project: default
 
